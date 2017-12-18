@@ -1,26 +1,41 @@
 # Replace header inoriginal file header with header in header file, writing output to outputfile
 # Larz60+
-from pathlib import Path
+# from pathlib import Path
+import os
+import sys
 import argparse
 
 
 class SwapHeaders:
     def __init__(self, origfile=None, headerfile=None, outfile=None):
-        self.home = Path('.')
-        self.data = self.home / 'data'
-        self.original_file = self.data / origfile
-        self.header_file = self.data / headerfile
-        self.out_file = self.data / outfile
+        # Note Modern pathlib objects removed because they won't work in
+        # outdated python 2.7
+        # self.home = Path('.')
+        # self.data = self.home / 'data'
+        # self.original_file = self.data / origfile
+        # self.header_file = self.data / headerfile
+        # self.out_file = self.data / outfi
 
-        with self.header_file.open() as fh:
+        # with self.header_file.open() as fh:
+        #     self.header_data = fh.readlines()
+
+        # self.orig = self.original_file.open()
+        # self.fo = self.out_file.open('w')
+
+        self.home = os.getcwd()
+        self.data = self.home + '\\data\\'
+        self.original_file = self.data + origfile[1:-1]
+        self.header_file = self.data + headerfile[1:-1]
+        self.out_file = self.data + outfile[1:-1]
+
+        with open(self.header_file, 'r') as fh:
             self.header_data = fh.readlines()
 
-        self.orig = self.original_file.open()
-        self.fo = self.out_file.open('w')
+        self.orig = open(self.original_file, 'r')
+        self.fo = None
 
     def close_files(self):
         self.orig.close()
-        self.fo.close()
 
     def get_replacement_header(self, match):
         retrec = None
@@ -44,7 +59,8 @@ class SwapHeaders:
             yield data
 
     def make_new_file(self):
-        with self.out_file.open('w') as fo:
+        # with self.out_file.open('w') as fo:
+        with open(self.out_file, 'w') as fo:
             for orig in self.read_orig_record():
                 match = None
                 if orig.startswith('>'):
